@@ -38,5 +38,14 @@ Key technical risks would be patient data leaking.
 Computing budget/Resource constraint: The computing budget when using google collab is 12.7 GB of RAM, 107GB of disc space and a T4 GPU with 16GB of VRAM. Alternatively, we can use rangpur where we have access to a NVIDA A100 GPU with 40GB or 80GB of VRAM and 7.5GB of disc space but limited usage since it's shared with the other members of the course. 
 
 # Working principles
+To make sure that I document all AI usage involved in the project.
 
 # Instructions
+Place your keras_slices_data .zip folder in the unet-s5045532, the python script will automatically unzip the folder and start using it to train/test/validate.
+
+# Artificial Intelligence Usage Disclosure
+- Which AI tool was used: Chat GPT for code generation.
+
+Chat GPT was used to generate the model, training, testing and verification code for the model. It was also used to generate some of the data loading script.
+
+I audited the code by first checking if there was any issues with runtime (e.g. exceptions thrown by the torch functions). I then checked the output of the model by giving the model a image, getting the output and plotting it to see if the output was consistent with what was required of the model.
