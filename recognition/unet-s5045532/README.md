@@ -1,13 +1,7 @@
 # Recognition Tasks
-Various recognition tasks solved in deep learning frameworks.
+- Image segmentation.
 
-Tasks may include:
-* Image Segmentation
-* Object detection
-* Graph node classification
-* Image super resolution
-* Disease classification
-* Generative modelling with StyleGAN and Stable Diffusion
+This project uses a 2D Improved-UNet for image segmentation of the keras_slices_data dataset which is based in hip MRI's.
 
 # Feasiblity report (from a word doc)
 
@@ -15,7 +9,7 @@ Intended user: The intended user is for medical staff.
 
 Model: 
 
-2D-improved U-net for image segmentation. 
+2D-improved UNet for image segmentation. 
 
 The plan is to get a Standard global Sørensen-Dice similarity coefficient greater than 0.75. 
 
