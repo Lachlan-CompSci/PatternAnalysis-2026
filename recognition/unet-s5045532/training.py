@@ -2,12 +2,16 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-
+import torch.optim as optim
+import modules 
+import dataset
 history = {
     "train_loss": [],
     "val_loss": [],
     "val_pixel_accuracy": [],
-    "val_mean_iou": []
+    "val_mean_iou": [],
+    "val_mean_dice": [],
+    "val_dice_per_class": []
 }
 
 """The validation function, the history dictionary, the training loop and the testing loop were all created by ChatGPT with the prompts:
@@ -108,6 +112,38 @@ def validate_model(model, val_loader, criterion, device, num_classes):
         if valid_classes.any() else 0.0
     )
 
+    # Calculate Dice coefficient for each class
+    dice_denominator = actual + predicted
+
+    # Ignore classes absent from both ground truth and predictions
+    valid_dice_classes = dice_denominator > 0
+
+    dice_per_class = torch.full(
+        (num_classes,), float("nan"), device=device
+    )
+
+    dice_per_class[valid_dice_classes] = (
+        2.0 * true_positives[valid_dice_classes]
+        / dice_denominator[valid_dice_classes]
+    )
+
+    # Mean Dice across classes that are present
+    mean_dice = (
+        dice_per_class[valid_dice_classes].mean().item()
+        if valid_dice_classes.any() else 0.0
+    )
+
+    print(f"Mean Dice: {mean_dice:.4f}")
+
+    print("\nDice coefficient per class:")
+    for class_id in range(num_classes):
+        dice = dice_per_class[class_id].item()
+        if dice == dice:  # Check for NaN
+            print(f"Class {class_id}: {dice:.4f}")
+        else:
+            print(f"Class {class_id}: N/A")
+
+
     print(
         f"Val Loss: {val_loss:.4f} | "
         f"Pixel Accuracy: {pixel_accuracy:.4%} | "
@@ -115,16 +151,28 @@ def validate_model(model, val_loader, criterion, device, num_classes):
     )
 
     return {
-        "val_loss": val_loss,
-        "val_pixel_accuracy": pixel_accuracy,
-        "val_mean_iou": mean_iou,
-        "val_iou_per_class": iou_per_class.cpu()
+    "val_loss": val_loss,
+    "val_pixel_accuracy": pixel_accuracy,
+    "val_mean_iou": mean_iou,
+    "val_iou_per_class": iou_per_class.cpu(),
+    "val_mean_dice": mean_dice,
+    "val_dice_per_class": dice_per_class.cpu()
     }
 
 #Training
-import torch.optim as optim
+device = modules.device
+NUM_CLASSES = modules.NUM_CLASSES
+model = modules.Improved2DUNet(
+    in_channels=1,
+    num_classes=modules.NUM_CLASSES,
+    base_filters=32,
+    dropout_rate=0.2
+).to(device)
 
-batch_size = 64
+batch_size = dataset.batch_size
+trainloader = dataset.trainloader
+testloader = dataset.testloader
+validationloader = dataset.validationloader
 EPOCHS = 50
 LEARNING_RATE = 1e-4
 
@@ -319,8 +367,6 @@ def test_model(model, test_loader, criterion, device, num_classes):
         "iou_per_class": iou_per_class.cpu(),
         "confusion_matrix": confusion_matrix.cpu()
     }
-
-NUM_CLASSES = 2  # Set this to your dataset's actual class count
 
 criterion = nn.CrossEntropyLoss()
 
