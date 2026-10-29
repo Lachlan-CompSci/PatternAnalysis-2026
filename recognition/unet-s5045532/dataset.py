@@ -9,12 +9,12 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
 #Relative Path definitions
-TRAINING_DATA_SET_PATH = "/keras_png_slices_data/keras_png_slices_train"
-TRAINING_DATA_SET_PATH_SEG = "/keras_png_slices_data/keras_png_slices_seg_train"
-TESTING_DATA_SET_PATH = "/keras_png_slices_data/keras_png_slices_test"
-TESTING_DATA_SET_PATH_SEG = "/keras_png_slices_data/keras_png_slices_seg_train"
-VALIDATION_DATA_SET_PATH = "/keras_png_slices_data/keras_png_slices_validate"
-VALIDATION_DATA_SET_PATH_SEG = "/keras_png_slices_data/keras_png_slices_seg_validate"
+TRAINING_DATA_SET_PATH = "/keras_slices_data/keras_slices_train"
+TRAINING_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_train"
+TESTING_DATA_SET_PATH = "/keras_slices_data/keras_slices_test"
+TESTING_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_train"
+VALIDATION_DATA_SET_PATH = "/keras_slices_data/keras_slices_validate"
+VALIDATION_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_validate"
 
 #.nii loading
 def to_channels ( arr : np . ndarray , dtype = np . uint8 ) -> np . ndarray :
@@ -180,6 +180,6 @@ trainloader = torch.utils.data.DataLoader(trainingDataset, batch_size=batch_size
 testloader = torch.utils.data.DataLoader(testingDataset, batch_size=batch_size, shuffle=False, num_workers=2)
 validationloader = torch.utils.data.DataLoader(validationDataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
-torch.save(trainloader, "/trainloader")
-torch.save(testloader,"/testloader")
-torch.save(validationloader, "/validationloader")
+torch.save(trainloader, "trainloader.pth")
+torch.save(testloader,"testloader.pth")
+torch.save(validationloader, "validationloader.pth")

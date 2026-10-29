@@ -1,15 +1,24 @@
 # Recognition Tasks
 - Image segmentation.
 
-This project uses a 2D Improved-UNet for image segmentation of the keras_slices_data dataset which is based in hip MRI's.
+This project uses a 2D Improved-UNet for image segmentation of the keras_slices_data dataset which is based in hip MRI's. The problem that it solves is that it lets doctors see the organs of a paitent given a hip MRI. 
+
+# Artifical intelligence disclaimer
+AI was used in this project.
+
+Tools used: Chat GPT for code generation and debugging.
+
+How it assisted me: It generated the model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of training.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small.
+
+I used AI to create a graph that plots the loss function over epochs.
+
+I audited the code by running the model everytime I added code to verify that it did not break.
 
 # Feasiblity report (from a word doc)
 
 Intended user: The intended user is for medical staff. 
 
-Model: 
-
-2D-improved UNet for image segmentation. 
+Model: 2D-improved UNet for image segmentation. 
 
 The plan is to get a Standard global Sørensen-Dice similarity coefficient greater than 0.75. 
 
@@ -37,6 +46,114 @@ Key technical risks would be patient data leaking.
 
 Computing budget/Resource constraint: The computing budget when using google collab is 12.7 GB of RAM, 107GB of disc space and a T4 GPU with 16GB of VRAM. Alternatively, we can use rangpur where we have access to a NVIDA A100 GPU with 40GB or 80GB of VRAM and 7.5GB of disc space but limited usage since it's shared with the other members of the course. 
 
+# Dependencies
+The project depends on the following librarys:
+- numpy (version 2.5.0)
+- glob (python version 3.5)
+- torch (version 2.15.0)
+- cv (version 5.0.0)
+- os (standard python library)
+- NiBabel (version 5.4.2)
+- tqdm (version 2.2.4)
+- matplotlib (version 3.11.2)
+
+# Example input, ground truth and output of the untrained model
+Given that the 2D Improved Unet is not trained yet, here's the output from the model given a input and the corrosponding ground truth.
+![](image.png)
+
+Here's the trained 2D Improved UNet input, ground truth and output:
+![](image-1.png)
+
+# Pre-processing
+The dataset was already pre-processed into training, training_seg, testing, testing_seg, validation and validation_seg so I just used what was provided to me. I normalized the training set using cv2. Here's the code snippet of that:
+
+```
+#NORMALIZE
+for image in training_image_array:
+  image = cv2.normalize(
+    image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+for image in training_image_array_seg:
+  image = cv2.normalize(
+  image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+```
+After normalizing, I created a Dataset loader wrapper for the training, testing and validation sets.
+
+# Benchmarking the Improved 2D Unet vs a normal 2D Unet
+
+# Dataset failures
+There were a few failures with the dataset. Most of the images come in 1 channel with 256x128 pixels, however, a few outliers came with 1 channel and 256x144 pixels. This caused the nifti function (load_data_2D()) to fail because it creates a numpy array based on the first image which was 256x128 so when the function tried to load a 256x144 file into the array, there wasn't enough allocated space and the function threw an error. Here's the creation of the numpy array:
+```
+if categorical:
+        first_case = to_channels(first_case, dtype=dtype)
+        rows, cols, channels = first_case.shape
+        images = np.zeros((num, rows, cols, channels), dtype=dtype)
+    else:
+        rows, cols = first_case.shape
+        images = np.zeros((num, rows, cols), dtype=dtype)
+```
+
+Here's where the error would throw for a 256x144 image:
+```
+if categorical:
+            inImage = to_channels(inImage, dtype=dtype)
+            images[valid_idx, :, :, :] = inImage
+        else:
+            images[valid_idx, :, :] = inImage
+```
+
+To fix this, I reimplemented the load_data_2D() function to ignore the 256x144 images, thus reducing the overall database size we can use but also making the database usable with nifti formatting.
+
+For the specific cases that failed because of this, there was case_019_week_1_slice_34.nii.gz, case_019_week_1_slice_11.nii.gz, case_019_week_1_slice_43.nii.gz, case_019_week_1_slice_5.nii.gz, case_019_week_1_slice_55.nii.gz, all of which were in the training segment and had a resolution of 256x144
+
+# Data Pipeline & Alignment
+
+# Quantitative Benchmarking and resource profile of the model
+## Training and validation data
+Dice coefficient per class:
+Class 0: 0.8191
+Class 1: 0.8430
+Class 2: 0.2693
+Class 3: 0.2667
+Class 4: 0.1041
+Class 5: 0.0881
+Val Loss: 1.5821 | Pixel Accuracy: 76.6900% | mIoU: 0.3055
+Train Loss: 0.0543
+## Testing data
+Test Loss:       1.2936
+Pixel Accuracy:  79.0729%
+Mean IoU:        0.3396
+Mean Dice:       0.4376
+
+Dice coefficient per class:
+Class 0: 0.8681
+Class 1: 0.8573
+Class 2: 0.3003
+Class 3: 0.3377
+Class 4: 0.1322
+Class 5: 0.1303
+
+IoU per class:
+Class 0: 0.7670
+Class 1: 0.7502
+Class 2: 0.1766
+Class 3: 0.2032
+Class 4: 0.0708
+Class 5: 0.0697
+
+GPU VRAM data:
+Total VRAM: 4716442.0199179845 MB
+Used VRAM: 661445.2114821324 MB
+Free VRAM: 4054996.808435852 MB
+
+The parameters of the model were 8113766.
+
+Inference time for the model on a T4 GPU: 0.009158134460449219 seconds 
+
+Here's a visual plot of the loss data in the training function over time:
+
 # Working principles
 
 # Instructions
+In dataset.py, please alter the PATH constants at the top of the file to wherever your keras_slices_data folder is. By default, the programme will check the unet-s5045532 folder for the keras_slices_data. Please make sure that you have the required packages as stated in the Dependencies header above.
+
+To run a prediction using predict.py, make sure that your model.pth file is in the unet-s5045532 directory or alter the LOAD_PATH constant to where you have your model.pth file.
