@@ -12,7 +12,7 @@ How it assisted me: It generated the model for me. It changed the load_data_2D()
 
 I used AI to create a graph that plots the loss function over epochs.
 
-I audited the code by running the model everytime I added code to verify that it did not break.
+I audited the code by first checking if there was any issues with runtime (e.g. exceptions thrown by the torch functions). I then checked the output of the model by giving the model a image, getting the output and plotting it to see if the output was consistent with what was required of the model.
 
 # Feasiblity report (from a word doc)
 
@@ -152,6 +152,7 @@ Inference time for the model on a T4 GPU: 0.009158134460449219 seconds
 Here's a visual plot of the loss data in the training function over time:
 
 # Working principles
+To make sure that I document all AI usage involved in the project.
 
 # Instructions
 In dataset.py, please alter the PATH constants at the top of the file to wherever your keras_slices_data folder is. By default, the programme will check the unet-s5045532 folder for the keras_slices_data. Please make sure that you have the required packages as stated in the Dependencies header above.
