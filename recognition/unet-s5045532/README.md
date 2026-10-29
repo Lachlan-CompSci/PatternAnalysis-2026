@@ -8,7 +8,7 @@ AI was used in this project.
 
 Tools used: Chat GPT for code generation and debugging.
 
-How it assisted me: It generated the model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of training.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small.
+How it assisted me: It generated the model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of training.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small. I got the AI to create the basic 2D UNet
 
 I used AI to create a graph that plots the loss function over epochs.
 
@@ -78,8 +78,81 @@ for image in training_image_array_seg:
 ```
 After normalizing, I created a Dataset loader wrapper for the training, testing and validation sets.
 
-# Benchmarking the Improved 2D Unet vs a normal 2D Unet
+# Benchmarking the Improved 2D Unet vs a basic 2D Unet
+## Basic 2D UNet:
+### Training and validation stats:
 
+Dice coefficient per class:
+Class 0: 0.8060
+Class 1: 0.8247
+Class 2: 0.2988
+Class 3: 0.2024
+Class 4: 0.0677
+Class 5: 0.1274
+Val Loss: 1.1088 | Pixel Accuracy: 74.7197% | mIoU: 0.2947
+Train Loss: 0.1238 | Val Loss: 1.1088
+
+### Testing stats:
+Test Results
+-----------------------------------
+Test Loss:       0.9350
+Pixel Accuracy:  77.3791%
+Mean IoU:        0.3150
+Mean Dice:       0.4030
+
+Dice coefficient per class:
+Class 0: 0.8581
+Class 1: 0.8411
+Class 2: 0.3436
+Class 3: 0.2259
+Class 4: 0.0484
+Class 5: 0.1008
+
+IoU per class:
+Class 0: 0.7514
+Class 1: 0.7258
+Class 2: 0.2075
+Class 3: 0.1273
+Class 4: 0.0248
+Class 5: 0.0530
+
+## Stats of the 2D Improved UNet:
+### Training and validation stats:
+
+Dice coefficient per class:
+Class 0: 0.8191
+Class 1: 0.8430
+Class 2: 0.2693
+Class 3: 0.2667
+Class 4: 0.1041
+Class 5: 0.0881
+Val Loss: 1.5821 | Pixel Accuracy: 76.6900% | mIoU: 0.3055
+Train Loss: 0.0543
+
+### Testing stats:
+
+Test Loss:       1.2936
+Pixel Accuracy:  79.0729%
+Mean IoU:        0.3396
+Mean Dice:       0.4376
+
+Dice coefficient per class:
+Class 0: 0.8681
+Class 1: 0.8573
+Class 2: 0.3003
+Class 3: 0.3377
+Class 4: 0.1322
+Class 5: 0.1303
+
+IoU per class:
+Class 0: 0.7670
+Class 1: 0.7502
+Class 2: 0.1766
+Class 3: 0.2032
+Class 4: 0.0708
+Class 5: 0.0697
+
+As we can see, the 2D Improved UNet has higher IoU, dice and lower loss than the basic 2D UNet
 # Dataset failures
 There were a few failures with the dataset. Most of the images come in 1 channel with 256x128 pixels, however, a few outliers came with 1 channel and 256x144 pixels. This caused the nifti function (load_data_2D()) to fail because it creates a numpy array based on the first image which was 256x128 so when the function tried to load a 256x144 file into the array, there wasn't enough allocated space and the function threw an error. Here's the creation of the numpy array:
 ```
@@ -147,9 +220,7 @@ Free VRAM: 4054996.808435852 MB
 
 The parameters of the model were 8113766.
 
-Inference time for the model on a T4 GPU: 0.009158134460449219 seconds 
-
-Here's a visual plot of the loss data in the training function over time:
+Inference time for the model on a T4 GPU: 0.009158134460449219 seconds
 
 # Working principles
 To make sure that I document all AI usage involved in the project.
