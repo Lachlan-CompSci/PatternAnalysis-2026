@@ -1,10 +1,6 @@
 import numpy as np
 import glob
-import numpy as np
-from PIL import Image
 import torch
-import numpy as np
-from PIL import Image
 import cv2
 import os
 import nibabel as nib
