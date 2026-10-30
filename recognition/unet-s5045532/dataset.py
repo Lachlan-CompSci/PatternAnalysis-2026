@@ -104,6 +104,7 @@ class CustomImageDataset(Dataset):
 
 #Returns a DataLoader for the training dataset
 # Note that workers are set to 0 to prevent issues with parallelism
+# The base of the loading of the data was made with AI which I built upon
 def loadTrainingData(batch_size : int, earlyStop=False):
   #TRAINING
   # Get all image paths
@@ -141,6 +142,7 @@ def loadTrainingData(batch_size : int, earlyStop=False):
 
 # Returns a Dataloader containing the testingDataset
 # Note that workers are set to 0 to prevent issues with parallelism
+# The base of the loading of the data was made with AI which I built upon
 def loadTestingData(batch_size : int, earlyStop=False):
   #TESTING
   # Get all image paths
@@ -169,6 +171,7 @@ def loadTestingData(batch_size : int, earlyStop=False):
 
 # Returns a Dataloader containing the validationDataset
 # Note that workers are set to 0 to prevent issues with parallelism
+# The base of the loading of the data was made with AI which I built upon
 def loadValidationData(batch_size : int, earlyStop=False):
   #VALIDATION
   # Get all image paths

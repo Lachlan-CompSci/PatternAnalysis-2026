@@ -3,6 +3,8 @@ import torch.nn as nn
 
 MODEL_SAVE_LOCATION = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\model.pth"
 batch_size = 64
+#Model, model Initialization and ResidualBlock all made with AI
+
 class ResidualBlock(nn.Module):
     """Two convolution layers with a residual connection."""
 
@@ -61,8 +63,8 @@ class Improved2DUNet(nn.Module):
     """
     Improved residual 2D U-Net for image segmentation.
 
-    Input:  (B, 1, 256, 256)
-    Output: (B, num_classes, 256, 256) logits
+    Input:  (B, 1, 256, 128)
+    Output: (B, num_classes, 256, 128) logits
     """
 
     def __init__(
@@ -168,7 +170,7 @@ model = Improved2DUNet(
 ).to(device)
 
 # Test the model
-x = torch.randn(64, 1, 256, 256, device=device)
+x = torch.randn(batch_size, 1, 256, 128, device=device)
 
 with torch.no_grad():
     logits = model(x)
@@ -178,4 +180,4 @@ print("Output shape:", logits.shape)
 print("Device:", device)
 print("Parameters:", sum(p.numel() for p in model.parameters()))
 
-assert logits.shape == (64, NUM_CLASSES, 256, 256)
+assert logits.shape == (batch_size, NUM_CLASSES, 256, 128)

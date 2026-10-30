@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 import modules 
 import dataset
-from torch.utils.data import DataLoader
 from modules import MODEL_SAVE_LOCATION
 history = {
     "train_loss": [],
@@ -19,7 +18,6 @@ EARLY_STOP_LOADING =  False
 """The validation function, the history dictionary, the training loop and the testing loop were all created by ChatGPT with the prompts:
 "Please create a testing loop for the model",
 "Can you please create a validation loop for the model"
-
 """
 
 #VALIDATION

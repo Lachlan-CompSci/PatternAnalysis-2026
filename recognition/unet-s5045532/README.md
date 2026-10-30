@@ -8,15 +8,15 @@ AI was used in this project.
 
 Tools used: Chat GPT for code generation and debugging.
 
-How it assisted me: It generated the 2D Improved UNet model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays on. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of predict.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small. I got the AI to create the basic 2D UNet to create the comparison between the two models.
+How it assisted me: It generated the 2D Improved UNet model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into lists on. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of predict.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small. I got the AI to create the basic 2D UNet to create the comparison between the two models.
 
-I used AI to create the code that created a graph that plots the loss function over epochs.
+I used AI to create the code that created a graph that plots the loss function over epochs which is featured in image-2 and image-3.
 
 I audited the code by first checking if there was any issues with runtime (e.g. exceptions thrown by the torch functions). I then checked the output of the model by giving the model a image, getting the output and plotting it to see if the output was consistent with what was required of the model.
 
 # Feasibility report (from a word doc)
 ## Disclaimer
-Please keep in mind that this is the original feasibility report and the dataset was initally based off the keras_slices_png_data which contains .png images rather than the keras_slices_data which contains .nii images. Items of interest include the resolution of the images (keras_slices_data images = 256x128 whereas keras_slices_png_data images = 256x256) etc...
+Please keep in mind that this is the original feasibility report and the dataset was initally based off the keras_slices_png_data which contains .png images rather than the keras_slices_data which contains .nii images. Items of interest include the resolution of the images (keras_slices_data images = 256x128 whereas keras_slices_png_data images = 256x256) being different between datasets etc...
 
 ## The report
 
@@ -231,8 +231,6 @@ To fix this, I reimplemented the load_data_2D() function to ignore the 256x144 i
 
 For the specific cases that failed because of this, there was case_019_week_1_slice_34.nii.gz, case_019_week_1_slice_11.nii.gz, case_019_week_1_slice_43.nii.gz, case_019_week_1_slice_5.nii.gz, case_019_week_1_slice_55.nii.gz, all of which were in the training segment and had a resolution of 256x144
 
-# Data Pipeline & Alignment
-
 # Quantitative Benchmarking and resource profile of the model
 ## Training and validation data
 Dice coefficient per class:
@@ -320,3 +318,7 @@ Please make sure that you have the required packages as stated in the Dependenci
 To run a prediction using predict.py, alter the LOAD_PATH constant to where you have your model.pth file.
 
 If you want to train the model then run training.py, this will automatically run dataset.py and modules.py where appropriate to load data and load the model to ultimately, train the model. Run predict.py if you want an example of the output.
+
+# References
+
+Pytorch documentation: https://docs.pytorch.org/docs/2.15/index.html

@@ -10,6 +10,7 @@ model = Improved2DUNet(
     dropout_rate=0.2
 ).to(device)
 model.load_state_dict(torch.load(MODEL_SAVE_LOCATION, weights_only=True))
+#Displaying of the images made with AI
 model.eval()
 testloader = loadTestingData(batch_size,earlyStop=True)
 images, masks = next(iter(testloader))
