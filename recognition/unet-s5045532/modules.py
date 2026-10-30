@@ -1,7 +1,8 @@
-import numpy as np
 import torch
 import torch.nn as nn
 
+MODEL_SAVE_LOCATION = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\model.pth"
+batch_size = 64
 class ResidualBlock(nn.Module):
     """Two convolution layers with a residual connection."""
 
@@ -67,7 +68,7 @@ class Improved2DUNet(nn.Module):
     def __init__(
         self,
         in_channels=1,
-        num_classes=2,
+        num_classes=6,
         base_filters=32,
         dropout_rate=0.2
     ):

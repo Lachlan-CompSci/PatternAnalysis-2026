@@ -8,13 +8,17 @@ AI was used in this project.
 
 Tools used: Chat GPT for code generation and debugging.
 
-How it assisted me: It generated the model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of training.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small. I got the AI to create the basic 2D UNet
+How it assisted me: It generated the 2D Improved UNet model for me. It changed the load_data_2D() function to reject images with 256x144 resolution. It gave me a starting point which I based putting my training, testing and verification data into numpy arrays on. It created the training and testing loops and implemented the verification system. It created the image generation example at the end of predict.py. It implemented the dice, loss, IoU results in the training and testing loops. It helped me figure out an issue wherein the size of my classes were too small. I got the AI to create the basic 2D UNet to create the comparison between the two models.
 
-I used AI to create a graph that plots the loss function over epochs.
+I used AI to create the code that created a graph that plots the loss function over epochs.
 
 I audited the code by first checking if there was any issues with runtime (e.g. exceptions thrown by the torch functions). I then checked the output of the model by giving the model a image, getting the output and plotting it to see if the output was consistent with what was required of the model.
 
-# Feasiblity report (from a word doc)
+# Feasibility report (from a word doc)
+## Disclaimer
+Please keep in mind that this is the original feasibility report and the dataset was initally based off the keras_slices_png_data which contains .png images rather than the keras_slices_data which contains .nii images. Items of interest include the resolution of the images (keras_slices_data images = 256x128 whereas keras_slices_png_data images = 256x256) etc...
+
+## The report
 
 Intended user: The intended user is for medical staff. 
 
@@ -76,81 +80,130 @@ for image in training_image_array_seg:
   image = cv2.normalize(
   image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
 ```
-After normalizing, I created a Dataset loader wrapper for the training, testing and validation sets.
+After normalizing, I created a torch Dataset loader wrapper for the training, testing and validation sets.
 
 # Benchmarking the Improved 2D Unet vs a basic 2D Unet
 ## Basic 2D UNet:
 ### Training and validation stats:
 
 Dice coefficient per class:
+
 Class 0: 0.8060
+
 Class 1: 0.8247
+
 Class 2: 0.2988
+
 Class 3: 0.2024
+
 Class 4: 0.0677
+
 Class 5: 0.1274
+
 Val Loss: 1.1088 | Pixel Accuracy: 74.7197% | mIoU: 0.2947
 Train Loss: 0.1238 | Val Loss: 1.1088
 
 ### Testing stats:
-Test Results
------------------------------------
+
 Test Loss:       0.9350
+
 Pixel Accuracy:  77.3791%
+
 Mean IoU:        0.3150
+
 Mean Dice:       0.4030
 
+
 Dice coefficient per class:
+
 Class 0: 0.8581
+
 Class 1: 0.8411
+
 Class 2: 0.3436
+
 Class 3: 0.2259
+
 Class 4: 0.0484
+
 Class 5: 0.1008
 
+
 IoU per class:
+
 Class 0: 0.7514
+
 Class 1: 0.7258
+
 Class 2: 0.2075
+
 Class 3: 0.1273
+
 Class 4: 0.0248
+
 Class 5: 0.0530
+
 
 ## Stats of the 2D Improved UNet:
 ### Training and validation stats:
 
 Dice coefficient per class:
+
 Class 0: 0.8191
+
 Class 1: 0.8430
+
 Class 2: 0.2693
+
 Class 3: 0.2667
+
 Class 4: 0.1041
+
 Class 5: 0.0881
+
 Val Loss: 1.5821 | Pixel Accuracy: 76.6900% | mIoU: 0.3055
 Train Loss: 0.0543
 
 ### Testing stats:
 
 Test Loss:       1.2936
+
 Pixel Accuracy:  79.0729%
+
 Mean IoU:        0.3396
+
 Mean Dice:       0.4376
 
+
 Dice coefficient per class:
+
 Class 0: 0.8681
+
 Class 1: 0.8573
+
 Class 2: 0.3003
+
 Class 3: 0.3377
+
 Class 4: 0.1322
+
 Class 5: 0.1303
 
+
 IoU per class:
+
 Class 0: 0.7670
+
 Class 1: 0.7502
+
 Class 2: 0.1766
+
 Class 3: 0.2032
+
 Class 4: 0.0708
+
 Class 5: 0.0697
+
 
 As we can see, the 2D Improved UNet has higher IoU, dice and lower loss than the basic 2D UNet
 # Dataset failures
@@ -183,39 +236,67 @@ For the specific cases that failed because of this, there was case_019_week_1_sl
 # Quantitative Benchmarking and resource profile of the model
 ## Training and validation data
 Dice coefficient per class:
+
 Class 0: 0.8191
+
 Class 1: 0.8430
+
 Class 2: 0.2693
+
 Class 3: 0.2667
+
 Class 4: 0.1041
+
 Class 5: 0.0881
+
 Val Loss: 1.5821 | Pixel Accuracy: 76.6900% | mIoU: 0.3055
 Train Loss: 0.0543
 ## Testing data
 Test Loss:       1.2936
+
 Pixel Accuracy:  79.0729%
+
 Mean IoU:        0.3396
+
 Mean Dice:       0.4376
 
+
 Dice coefficient per class:
+
 Class 0: 0.8681
+
 Class 1: 0.8573
+
 Class 2: 0.3003
+
 Class 3: 0.3377
+
 Class 4: 0.1322
+
 Class 5: 0.1303
 
+
 IoU per class:
+
 Class 0: 0.7670
+
 Class 1: 0.7502
+
 Class 2: 0.1766
+
 Class 3: 0.2032
+
 Class 4: 0.0708
+
 Class 5: 0.0697
 
+
 GPU VRAM data:
+
 Total VRAM: 4716442.0199179845 MB
+
 Used VRAM: 661445.2114821324 MB
+
 Free VRAM: 4054996.808435852 MB
 
 The parameters of the model were 8113766.
@@ -223,9 +304,19 @@ The parameters of the model were 8113766.
 Inference time for the model on a T4 GPU: 0.009158134460449219 seconds
 
 # Working principles
-To make sure that I document all AI usage involved in the project.
+To make sure that I document all AI usage involved in the project and make appropriate references when required. That I try and keep good progress and put the work in. That I ultimately learn something from this project.
 
 # Instructions
-In dataset.py, please alter the PATH constants at the top of the file to wherever your keras_slices_data folder is. By default, the programme will check the unet-s5045532 folder for the keras_slices_data. Please make sure that you have the required packages as stated in the Dependencies header above.
+Keep in mind that the dataset this model is built to take in is the keras_slices_data.
 
-To run a prediction using predict.py, make sure that your model.pth file is in the unet-s5045532 directory or alter the LOAD_PATH constant to where you have your model.pth file.
+In dataset.py, please alter the path constants at the top of the file to wherever your keras_slices_data folder is, ideally use the absolute path since it failed when I tried using a relative path (this goes for all path constants).
+
+In modules.py, please change the MODEL_SAVE_LOCATION to wherever you want to place your saved model, also alter the batch_size in the same file if you desire a different size.
+
+In training.py, please change the EARLY_STOP_LOADING if you want to enable or disable early stoppage of loading.
+
+Please make sure that you have the required packages as stated in the Dependencies header above.
+
+To run a prediction using predict.py, alter the LOAD_PATH constant to where you have your model.pth file.
+
+If you want to train the model then run training.py, this will automatically run dataset.py and modules.py where appropriate to load data and load the model to ultimately, train the model. Run predict.py if you want an example of the output.

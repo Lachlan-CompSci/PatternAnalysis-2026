@@ -6,17 +6,17 @@ import os
 import nibabel as nib
 from tqdm import tqdm
 from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
 
 #Relative Path definitions
-TRAINING_DATA_SET_PATH = "/keras_slices_data/keras_slices_train"
-TRAINING_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_train"
-TESTING_DATA_SET_PATH = "/keras_slices_data/keras_slices_test"
-TESTING_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_train"
-VALIDATION_DATA_SET_PATH = "/keras_slices_data/keras_slices_validate"
-VALIDATION_DATA_SET_PATH_SEG = "/keras_slices_data/keras_slices_seg_validate"
+TRAINING_DATA_SET_PATH = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_train"
+TRAINING_DATA_SET_PATH_SEG = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_seg_train"
+TESTING_DATA_SET_PATH = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_test"
+TESTING_DATA_SET_PATH_SEG = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_seg_test"
+VALIDATION_DATA_SET_PATH = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_validate"
+VALIDATION_DATA_SET_PATH_SEG = "C:\\Users\\lachl\\Documents\\UQ CS\\COMP3710\\PatternAnalysis-2026\\recognition\\unet-s5045532\\keras_slices_data\\keras_slices_data\\keras_slices_seg_validate"
 
-#.nii loading
+#Nifti loading initally provided by Shakes Chandra on Appendix B of the report draft for the assignment
+#with some modifications due to AI to reject images of 256x144
 def to_channels ( arr : np . ndarray , dtype = np . uint8 ) -> np . ndarray :
   channels = np . unique ( arr )
   res = np . zeros ( arr . shape + ( len ( channels ) ,) , dtype = dtype )
@@ -91,74 +91,6 @@ def load_data_2D(imageNames, normImage=False, categorical=False,
     else:
         return images
 
-
-#TRAINING
-# Get all image paths
-folder_path = TRAINING_DATA_SET_PATH + "/*.gz"
-file_list = glob.glob(folder_path)
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(TRAINING_DATA_SET_PATH + "/",""))
-os.chdir(TRAINING_DATA_SET_PATH)
-training_image_array = load_data_2D(array0)
-
-# Get all image paths
-folder_path = TRAINING_DATA_SET_PATH_SEG + "/*.gz"
-file_list = glob.glob(folder_path)
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(TRAINING_DATA_SET_PATH + "/",""))
-os.chdir(TRAINING_DATA_SET_PATH_SEG)
-training_image_array_seg = load_data_2D(array0)
-
-#TESTING
-# Get all image paths
-folder_path = TESTING_DATA_SET_PATH + "/*.gz"
-file_list = glob.glob(folder_path)
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(TESTING_DATA_SET_PATH + "/",""))
-os.chdir(TESTING_DATA_SET_PATH)
-testing_image_array = load_data_2D(array0)
-
-# Get all image paths
-folder_path = TESTING_DATA_SET_PATH_SEG + "/*.gz"
-file_list = glob.glob(folder_path)
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(TESTING_DATA_SET_PATH_SEG + "/",""))
-os.chdir(TESTING_DATA_SET_PATH_SEG)
-testing_image_array_seg = load_data_2D(array0)
-
-#VALIDATION
-# Get all image paths
-folder_path = VALIDATION_DATA_SET_PATH + "/*.gz"
-file_list = glob.glob(folder_path)
-
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(VALIDATION_DATA_SET_PATH + "/",""))
-os.chdir(VALIDATION_DATA_SET_PATH)
-validation_image_array = load_data_2D(array0)
-
-# Get all image paths
-folder_path = VALIDATION_DATA_SET_PATH_SEG + "/*.gz"
-file_list = glob.glob(folder_path)
-
-array0 = []
-for fname in file_list:
-  array0.append(fname.replace(VALIDATION_DATA_SET_PATH_SEG + "/",""))
-os.chdir(VALIDATION_DATA_SET_PATH_SEG)
-validation_image_array_seg = load_data_2D(array0)
-
-#NORMALIZE
-for image in training_image_array:
-  image = cv2.normalize(
-    image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
-for image in training_image_array_seg:
-  image = cv2.normalize(
-  image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
-
 class CustomImageDataset(Dataset):
   imageSet : np.ndarray
   segImageSet : np.ndarray
@@ -169,17 +101,98 @@ class CustomImageDataset(Dataset):
     return len(self.imageSet)
   def __getitem__(self, index):
      return (self.imageSet[index],self.segImageSet[index])
-trainingDataset = CustomImageDataset(training_image_array,training_image_array_seg)
-testingDataset = CustomImageDataset(testing_image_array,testing_image_array_seg)
-validationDataset = CustomImageDataset(validation_image_array,validation_image_array_seg)
 
-batch_size = 64
+#Returns a DataLoader for the training dataset
+# Note that workers are set to 0 to prevent issues with parallelism
+def loadTrainingData(batch_size : int, earlyStop=False):
+  #TRAINING
+  # Get all image paths
+  folder_path = TRAINING_DATA_SET_PATH + "/*.gz"
+  file_list = glob.glob(folder_path)
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(TRAINING_DATA_SET_PATH + "/",""))
+  os.chdir(TRAINING_DATA_SET_PATH)
+  training_image_array = load_data_2D(array0, early_stop=earlyStop)
 
-trainloader = torch.utils.data.DataLoader(trainingDataset, batch_size=batch_size,
-                                          shuffle=True, num_workers=2)
-testloader = torch.utils.data.DataLoader(testingDataset, batch_size=batch_size, shuffle=False, num_workers=2)
-validationloader = torch.utils.data.DataLoader(validationDataset, batch_size=batch_size, shuffle=False, num_workers=2)
+  # Get all image paths
+  folder_path = TRAINING_DATA_SET_PATH_SEG + "/*.gz"
+  file_list = glob.glob(folder_path)
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(TRAINING_DATA_SET_PATH + "/",""))
+  os.chdir(TRAINING_DATA_SET_PATH_SEG)
+  training_image_array_seg = load_data_2D(array0, early_stop=earlyStop)
 
-torch.save(trainloader, "trainloader.pth")
-torch.save(testloader,"testloader.pth")
-torch.save(validationloader, "validationloader.pth")
+  #NORMALIZE
+  for image in training_image_array:
+    image = cv2.normalize(
+      image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+  for image in training_image_array_seg:
+    image = cv2.normalize(
+    image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+
+  trainingDataset = CustomImageDataset(training_image_array,training_image_array_seg)
+
+  trainloader = torch.utils.data.DataLoader(trainingDataset, batch_size=batch_size,
+                                          shuffle=True, num_workers=0)
+
+  return trainloader
+
+# Returns a Dataloader containing the testingDataset
+# Note that workers are set to 0 to prevent issues with parallelism
+def loadTestingData(batch_size : int, earlyStop=False):
+  #TESTING
+  # Get all image paths
+  folder_path = TESTING_DATA_SET_PATH + "/*.gz"
+  file_list = glob.glob(folder_path)
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(TESTING_DATA_SET_PATH + "/",""))
+  os.chdir(TESTING_DATA_SET_PATH)
+  testing_image_array = load_data_2D(array0, early_stop=earlyStop)
+
+  # Get all image paths
+  folder_path = TESTING_DATA_SET_PATH_SEG + "/*.gz"
+  file_list = glob.glob(folder_path)
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(TESTING_DATA_SET_PATH_SEG + "/",""))
+  os.chdir(TESTING_DATA_SET_PATH_SEG)
+  testing_image_array_seg = load_data_2D(array0, early_stop=earlyStop)
+
+  testingDataset = CustomImageDataset(testing_image_array,testing_image_array_seg)
+
+  testloader = torch.utils.data.DataLoader(testingDataset, batch_size=batch_size, shuffle=False, num_workers=0)
+
+  return testloader
+
+# Returns a Dataloader containing the validationDataset
+# Note that workers are set to 0 to prevent issues with parallelism
+def loadValidationData(batch_size : int, earlyStop=False):
+  #VALIDATION
+  # Get all image paths
+  folder_path = VALIDATION_DATA_SET_PATH + "/*.gz"
+  file_list = glob.glob(folder_path)
+
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(VALIDATION_DATA_SET_PATH + "/",""))
+  os.chdir(VALIDATION_DATA_SET_PATH)
+  validation_image_array = load_data_2D(array0, early_stop=earlyStop)
+
+  # Get all image paths
+  folder_path = VALIDATION_DATA_SET_PATH_SEG + "/*.gz"
+  file_list = glob.glob(folder_path)
+
+  array0 = []
+  for fname in file_list:
+    array0.append(fname.replace(VALIDATION_DATA_SET_PATH_SEG + "/",""))
+  os.chdir(VALIDATION_DATA_SET_PATH_SEG)
+  validation_image_array_seg = load_data_2D(array0, early_stop=earlyStop)
+
+  validationDataset = CustomImageDataset(validation_image_array,validation_image_array_seg)
+
+  validationloader = torch.utils.data.DataLoader(validationDataset, batch_size=batch_size, shuffle=False, num_workers=0)
+
+  return validationloader

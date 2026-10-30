@@ -1,21 +1,17 @@
 import torch
-import modules
-from dataset import testloader
+from modules import device, NUM_CLASSES, Improved2DUNet, batch_size, MODEL_SAVE_LOCATION
 import matplotlib.pyplot as plt
+from dataset import loadTestingData
 
-LOAD_PATH = "model.pth"
-
-device = modules.device
-NUM_CLASSES = modules.NUM_CLASSES
-model = model = modules.Improved2DUNet(
+model = Improved2DUNet(
     in_channels=1,
     num_classes=NUM_CLASSES,
     base_filters=32,
     dropout_rate=0.2
 ).to(device)
-model.load_state_dict(torch.load(LOAD_PATH, weights_only=True))
+model.load_state_dict(torch.load(MODEL_SAVE_LOCATION, weights_only=True))
 model.eval()
-
+testloader = loadTestingData(batch_size,earlyStop=True)
 images, masks = next(iter(testloader))
 
 # Ensure channels-first format
