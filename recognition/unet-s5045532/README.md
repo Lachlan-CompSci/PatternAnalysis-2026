@@ -86,6 +86,8 @@ After normalizing, I created a torch Dataset loader wrapper for the training, te
 ## Basic 2D UNet:
 ### Training and validation stats:
 
+![](image-3.png)
+
 Dice coefficient per class:
 
 Class 0: 0.8060
@@ -146,6 +148,8 @@ Class 5: 0.0530
 
 ## Stats of the 2D Improved UNet:
 ### Training and validation stats:
+
+![](image-2.png)
 
 Dice coefficient per class:
 
